@@ -1,314 +1,290 @@
-"use client"
-
-import type React from "react"
-
-import { useState, useEffect, useRef } from "react"
+// components/SingleNewsTab.tsx
+import { useState } from "react"
+import { Calendar, ArrowLeft, Share2, Heart, MessageSquare } from "lucide-react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Menu, X, ChevronDown } from "lucide-react"
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
+import { FaInstagram, FaWhatsapp } from "react-icons/fa"
+import ReadAlsoSection from "./read-also-section"
 
-interface HeaderProps {
-  activeTab: string
+interface SingleNewsTabProps {
+  newsId: string
   onTabChange: (tab: string) => void
+  onBackToNews: () => void
+  onSelectNews?: (newsId: string) => void 
 }
 
-export default function Header({ activeTab, onTabChange }: HeaderProps) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
-  const dropdownRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
-    }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+const allNews = [
+  {
+    id: "william-sub15-terceiro-milenio",
+    title: "William do nosso Sub-15 Inicia Nova Jornada no Terceiro Milênio",
+    date: "03 de Julho, 2025",
+    excerpt:
+      "William aluno do Sub-15 da nossa Escolinha 10 na Bola, deu um importante passo na carreira: agora faz parte do tradicional clube Terceiro Milênio.",
+    image: "/images/materia willian.png",
+    category: "Depoimentos",
+    highlight: true,
+    content: `
+      <p>William, atleta da categoria Sub-15 da nossa Escolinha 10 na Bola, deu um passo importante em sua carreira: agora faz parte do tradicional <strong>Clube Terceiro Milênio</strong>.</p>
+      <p>Em entrevista à nossa equipe, ele contou como foi sua trajetória até essa conquista e quais são suas expectativas para o futuro no futebol.</p>
+      <h3>Um sonho em construção</h3>
+      <p>Com apenas 15 anos, William foi aprovado no Clube Terceiro Milênio, referência na formação de jovens talentos na Zona Sul de São Paulo.</p>
+      <h3>“Esse é o meu primeiro grande passo”</h3>
+      <blockquote><p>"Me sinto feliz e confiante. Esse é o primeiro passo da minha carreira, e espero que através desse clube eu me torne um grande jogador."</p></blockquote>
+      <h3>Parabéns, William!</h3>
+      <p>Parabenizamos o William por essa nova fase e desejamos muito sucesso nessa jornada. Seguiremos acompanhando sua evolução com orgulho e torcida!</p>
+    `,
+  },
+  {
+    id: "copa-rei-2025",
+    title: "Conquista Histórica na Copa do Rei 2025",
+    date: "28 de Junho, 2025",
+    excerpt:
+      "Nossas equipes Sub-13 e Sub-17 conquistaram o título da Copa do Rei 2025, marcando um ano histórico para nossa escola.",
+    image: "/images/copa-rei-2025-sub13-campeao.png",
+    category: "Campeonatos",
+    highlight: true,
+    content: `
+      <p>Em uma campanha histórica, as equipes Sub-13 e Sub-17 da Escola de Futebol 10 na Bola conquistaram os títulos da Copa do Rei 2025, consolidando nossa posição como uma das principais escolas de futebol da Zona Sul de São Paulo.</p>
+      <h3>Sub-13 - Campeões Invictos</h3>
+      <p>A equipe Sub-13 teve uma campanha perfeita, vencendo todos os jogos da competição.</p>
+      <h3>Sub-17 - Dominando a Categoria</h3>
+      <p>A equipe Sub-17 confirmou o favoritismo e conquistou o título com autoridade.</p>
+    `,
+  },
+  {
+    id: "copa-art-soccer-2025",
+    title: "Finais da Copa Art Soccer 2025",
+    date: "29 de Junho, 2025",
+    excerpt:
+      "As equipes Sub-08, Sub-10, Sub-12 e Sub-14 da Escolinha 10 na Bola participaram das emocionantes finais da Copa Art Soccer 2025.",
+    image: "/images/copa-art-soccer-2025-finais.png",
+    category: "Campeonatos",
+    highlight: true,
+    content: `
+      <p>A Copa Art Soccer 2025 foi palco de grandes emoções para nossas categorias de base.</p>
+      <h3>Resultados das Finais</h3>
+      <ul>
+        <li><strong>Sub-08:</strong> Vice-campeão</li>
+        <li><strong>Sub-10:</strong> Campeão</li>
+        <li><strong>Sub-12:</strong> Vice-campeão</li>
+        <li><strong>Sub-14:</strong> Campeão</li>
+      </ul>
+    `,
+  },
+  {
+    id: "ferias-2025",
+    title: "Férias com Bola Rolando!",
+    date: "01 de Julho, 2025",
+    excerpt: "Dia 01 de julho marcou o início oficial das férias na Escolinha 10 na Bola com atividades especiais.",
+    image: "/images/DIA 01-07 INICIO DAS FÉRIAS NA NOSSA ESCOLINHA (1).png",
+    category: "Comunicados",
+    highlight: true,
+    content: `
+      <p>As férias escolares chegaram, mas na Escolinha 10 na Bola a diversão e o aprendizado continuam!</p>
+      <h3>Programação Especial</h3>
+      <ul>
+        <li>Treinos técnicos com atividades lúdicas</li>
+        <li>Jogos recreativos entre as categorias</li>
+        <li>Atividades de integração e confraternização</li>
+        <li>Workshops sobre nutrição esportiva</li>
+        <li>Sessões de cinema com filmes esportivos</li>
+      </ul>
+    `,
+  },
+  {
+    id: "camisas-venda-2025",
+    title: "Camisas Oficiais à Venda – Escolinha 10 na Bola",
+    date: "01 de Julho, 2025",
+    excerpt:
+      "Já estão disponíveis as novas camisas oficiais da Escolinha 10 na Bola! Garanta a sua e venha treinar com o manto.",
+    image: "/images/COPA SOCCER EDIÇÃO 2024 (2).png",
+    category: "Comunicados",
+    highlight: true,
+    content: `
+      <p>Já estão disponíveis as novas camisas oficiais da Escolinha 10 na Bola!</p>
+      <h3>Modelos Disponíveis:</h3>
+      <ul>
+        <li><strong>Camisa Cinza:</strong> Ideal para treinos</li>
+        <li><strong>Camisa Branca:</strong> Para competições</li>
+      </ul>
+      <h3>Preço:</h3>
+      <p>R$ 100,00</p>
+    `,
+  },
+];
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setActiveDropdown(null)
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+const imageGallery = [
+  "/images/terça feira.png",
+  "/images/galeria2.jpg",
+  "/images/galeria3.jpg",
+  "/images/galeria4.jpg",
+]
 
-  const menuItems = [
-    {
-      label: "Início",
-      id: "home",
-      type: "single",
-    },
-    {
-      label: "Radar",
-      id: "all-news",
-      type: "single",
-    },
-    {
-      label: "A Escolinha",
-      id: "escolinha",
-      type: "dropdown",
-      items: [
-        { label: "Nossa História", id: "sobre" },
-        { label: "Treinos", id: "treinos" },
-      ],
-    },
-    {
-      label: "Atividades",
-      id: "atividades",
-      type: "dropdown",
-      items: [
-        { label: "Campeonatos", id: "campeonatos" },
-        { label: "Vídeos", id: "videos" },
-        { label: "Galeria", id: "galeria" },
-      ],
-    },
-    {
-      label: "Comunidade",
-      id: "comunidade",
-      type: "dropdown",
-      items: [
-        { label: "Depoimentos", id: "depoimentos" },
-        { label: "Parcerias", id: "parcerias" },
-        { label: "Apoie o Projeto", id: "apoie" },
-      ],
-    },
-    {
-      label: "Suporte",
-      id: "suporte",
-      type: "dropdown",
-      items: [
-        { label: "FAQ", id: "faq" },
-        { label: "Contato", id: "contato" },
-      ],
-    },
-  ]
+export default function SingleNewsTab({ newsId, onTabChange, onBackToNews }: SingleNewsTabProps) {
+  const [liked, setLiked] = useState(false)
+  const [shared, setShared] = useState(false)
+  const [comment, setComment] = useState("")
+  const [comments, setComments] = useState<string[]>([])
 
-  const handleInscricaoClick = () => {
-    const whatsappUrl =
-      "https://linktr.ee/Escolinha10NaBola?fbclid=PAZXh0bgNhZW0CMTEAAacrO_kAG8u5AkYnVPtJTjENaE9qkoTbGwCTWheUKm7pmAqVCWtlxSsp4v15XA_aem_voYzNcNViPY9U41uxjvuVg"
-    window.open(whatsappUrl, "_blank")
-  }
+  const news = allNews.find((n) => n.id === newsId)
 
-  const handleMenuClick = (item: any) => {
-    if (item.type === "single") {
-      onTabChange(item.id)
-      setActiveDropdown(null)
-      setIsMenuOpen(false)
+  if (!news) return <div className="text-center py-24">Notícia não encontrada</div>
+
+  const relatedNews = allNews.filter(n => n.id !== news.id).slice(0, 4)
+
+  const handleLike = () => setLiked(!liked)
+
+  const handleShare = () => {
+    const url = typeof window !== "undefined" ? window.location.href : ""
+    if (navigator.share) {
+      navigator.share({ title: "Notícia 10 na Bola", url })
     } else {
-      setActiveDropdown(activeDropdown === item.id ? null : item.id)
+      navigator.clipboard.writeText(url)
+      setShared(true)
+      setTimeout(() => setShared(false), 3000)
     }
   }
 
-  const handleSubMenuClick = (event: React.MouseEvent | React.TouchEvent, id: string) => {
-    // Prevenir comportamentos padrão
-    event.preventDefault()
-    event.stopPropagation()
-
-    // Log para debug (remover depois)
-    console.log("SubMenu clicked:", id)
-
-    // Fechar dropdown imediatamente
-    setActiveDropdown(null)
-
-    // Fechar menu mobile
-    setIsMenuOpen(false)
-
-    // Pequeno delay para garantir que a navegação aconteça após o fechamento
-    setTimeout(() => {
-      onTabChange(id)
-    }, 50)
-  }
-
-  const handleLogoClick = () => {
-    onTabChange("home")
-    setIsMenuOpen(false)
-  }
-
-  const isActiveItem = (item: any) => {
-    if (item.type === "single") {
-      return activeTab === item.id
-    } else {
-      return item.items?.some((subItem: any) => subItem.id === activeTab)
+  const handleCommentSubmit = () => {
+    if (comment.trim() !== "") {
+      setComments([...comments, comment.trim()])
+      setComment("")
     }
   }
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 bg-center bg-cover bg-no-repeat ${
-        isScrolled
-          ? "bg-[linear-gradient(to_right,_rgba(0,0,0,0.85),_rgba(153,27,27,0.75),_rgba(220,38,38,0.65)),url('/images/campo.png')] backdrop-blur-xl shadow-2xl border-b border-red-600/60"
-          : "bg-[linear-gradient(to_right,_rgba(0,0,0,0.8),_rgba(153,27,27,0.7),_rgba(220,38,38,0.6)),url('/images/campo.png')] backdrop-blur-md"
-      }`}
-    >
-      <div className="container mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16 sm:h-20">
-          {/* Logo */}
-          <button
-            onClick={handleLogoClick}
-            className="flex items-center group focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent rounded-lg"
+    <div className="max-w-7xl mx-auto py-10 px-4 grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-12 font-sans">
+      <main className="prose prose-lg prose-slate max-w-none">
+        <div className="mb-6">
+          <Button onClick={onBackToNews} variant="outline" className="flex items-center text-sm">
+            <ArrowLeft className="w-4 h-4 mr-2" /> Voltar para lista
+          </Button>
+        </div>
+
+        <h1 className="text-4xl font-extrabold text-slate-900 mb-2 leading-tight">
+          {news.title}
+        </h1>
+
+        <div className="flex items-center text-slate-500 text-sm mb-4">
+          <Calendar className="w-4 h-4 mr-1" />
+          {news.date}
+        </div>
+
+        <div className="relative w-full aspect-[16/9] mb-6 rounded-md overflow-hidden shadow-md">
+          <Image src={news.image} alt={news.title} fill className="object-cover" />
+        </div>
+
+        <div className="flex flex-wrap gap-4 mb-8">
+          <Button variant="ghost" size="sm" onClick={handleLike} className={liked ? "text-red-600" : "text-slate-700"}>
+            <Heart className={`w-4 h-4 mr-1 ${liked ? "fill-red-600" : ""}`} />
+            {liked ? "Curtido" : "Curtir"}
+          </Button>
+
+          <Button variant="ghost" size="sm" onClick={handleShare}>
+            <Share2 className="w-4 h-4 mr-1" /> {shared ? "Link copiado!" : "Compartilhar"}
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex items-center gap-1 text-green-600"
+            onClick={() => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(news.title + ' - ' + window.location.href)}`)}
           >
-            <div className="relative">
-              <Image
-                src="/images/logo-10-na-bola.png"
-                alt="10 na Bola"
-                width={100}
-                height={100}
-                className="w-[120px] h-[120px] sm:w-[170px] sm:h-[170px] object-contain transition-transform duration-500 group-hover:scale-110 hover-glow"
-              />
-            </div>
-          </button>
+            <FaWhatsapp className="w-4 h-4" /> WhatsApp
+          </Button>
 
-          {/* Desktop Menu */}
-          <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8" ref={dropdownRef}>
-            {menuItems.map((item) => (
-              <div key={item.label} className="relative">
-                <button
-                  onClick={() => handleMenuClick(item)}
-                  className={`flex items-center space-x-1 font-medium text-sm tracking-wide transition-all duration-300 py-2 px-3 xl:px-4 rounded-lg hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent ${
-                    isActiveItem(item)
-                      ? "text-red-200 bg-white/15 shadow-lg backdrop-blur-sm"
-                      : "text-white hover:text-red-200 hover:bg-white/10 hover:backdrop-blur-sm"
-                  }`}
-                >
-                  <span className="text-shadow">{item.label}</span>
-                  {item.type === "dropdown" && (
-                    <ChevronDown
-                      className={`w-4 h-4 transition-transform duration-300 ${
-                        activeDropdown === item.id ? "rotate-180" : ""
-                      }`}
-                    />
-                  )}
-                </button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex items-center gap-1 text-pink-500"
+            onClick={() => window.open(`https://www.instagram.com/?url=${encodeURIComponent(window.location.href)}`)}
+          >
+            <FaInstagram className="w-4 h-4" /> Instagram
+          </Button>
+        </div>
 
-                {/* Dropdown Menu */}
-                {item.type === "dropdown" && activeDropdown === item.id && (
-                  <div className="absolute top-full left-0 mt-2 w-56 bg-white/95 backdrop-blur-lg rounded-xl shadow-2xl border border-slate-200/50 py-2 z-50 animate-fade-in-down">
-                    {item.items?.map((subItem) => (
-                      <button
-                        key={subItem.id}
-                        onClick={(e) => handleSubMenuClick(e, subItem.id)}
-                        className={`w-full text-left px-4 py-3 text-sm transition-all duration-300 hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-inset ${
-                          activeTab === subItem.id
-                            ? "text-blue-600 bg-blue-50/80 font-semibold backdrop-blur-sm"
-                            : "text-slate-700 hover:text-blue-600 hover:bg-slate-50/80 hover:backdrop-blur-sm"
-                        }`}
-                      >
-                        {subItem.label}
-                      </button>
-                    ))}
+        <div dangerouslySetInnerHTML={{ __html: news.content }} />
+
+        <div className="mt-12">
+          <h3 className="text-2xl font-bold mb-4">📸 Galeria de Fotos</h3>
+          <Carousel className="w-full max-w-4xl mx-auto">
+            <CarouselContent>
+              {imageGallery.map((src, index) => (
+                <CarouselItem key={index} className="flex justify-center">
+                  <div className="relative w-full h-72 md:h-96 rounded overflow-hidden">
+                    <Image src={src} alt={`Imagem ${index + 1}`} fill className="object-cover" />
                   </div>
-                )}
-              </div>
-            ))}
-          </nav>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        </div>
 
-          {/* CTA Button */}
-          <div className="hidden lg:block">
-            <Button
-              className="bg-white text-red-600 hover:bg-red-50 font-semibold px-4 xl:px-6 py-2.5 text-sm tracking-wide transition-all duration-300 hover:shadow-xl hover-lift btn-hover-lift ripple focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-red-600"
-              onClick={handleInscricaoClick}
-            >
-              Inscreva-se
+        <div className="mt-12 border-t pt-6">
+          <h3 className="text-xl font-bold text-slate-900 mb-2 flex items-center">
+            <MessageSquare className="w-4 h-4 mr-2" /> Comentários
+          </h3>
+          <div className="space-y-4">
+            {comments.length > 0 ? (
+              comments.map((c, i) => (
+                <div key={i} className="bg-slate-100 p-3 rounded text-sm text-slate-800">
+                  {c}
+                </div>
+              ))
+            ) : (
+              <p className="text-slate-500">Nenhum comentário ainda. Seja o primeiro!</p>
+            )}
+            <div className="flex flex-col sm:flex-row gap-2 mt-4">
+              <input
+                type="text"
+                placeholder="Escreva um comentário..."
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                className="border px-3 py-2 rounded w-full text-sm"
+              />
+              <Button onClick={handleCommentSubmit} className="bg-blue-900 text-white">
+                Enviar
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t mt-12 pt-6 text-center">
+          <h2 className="text-2xl font-semibold mb-2">Gostou da notícia?</h2>
+          <p className="text-slate-600 mb-4">Compartilhe com seus amigos ou conheça mais sobre a nossa escola.</p>
+          <div className="flex justify-center gap-4">
+            <Button className="bg-blue-900 text-white">Entrar em Contato</Button>
+            <Button variant="outline" className="border-blue-900 text-blue-900" onClick={() => onTabChange("sobre")}>
+              Conheça a Escola
             </Button>
           </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="lg:hidden p-2 rounded-lg hover:bg-red-800/50 transition-all duration-300 hover-scale touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            <div className="relative w-6 h-6">
-              <Menu
-                className={`absolute inset-0 transition-all duration-300 text-white ${
-                  isMenuOpen ? "opacity-0 rotate-90" : "opacity-100 rotate-0"
-                }`}
-                size={24}
-              />
-              <X
-                className={`absolute inset-0 transition-all duration-300 text-white ${
-                  isMenuOpen ? "opacity-100 rotate-0" : "opacity-0 -rotate-90"
-                }`}
-                size={24}
-              />
-            </div>
-          </button>
         </div>
+      </main>
 
-        {/* Mobile Menu */}
-        <div
-          className={`lg:hidden overflow-hidden transition-all duration-500 ${
-            isMenuOpen ? "max-h-[80vh] opacity-100 pb-6" : "max-h-0 opacity-0"
-          }`}
-        >
-          <div className="border-t border-red-600/50 pt-6">
-            <nav className="flex flex-col space-y-1">
-              {menuItems.map((item) => (
-                <div key={item.label}>
-                  <button
-                    onClick={() => handleMenuClick(item)}
-                    className={`w-full text-left font-medium text-sm tracking-wide transition-all duration-300 py-3 px-4 rounded-lg hover-lift touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent ${
-                      isActiveItem(item)
-                        ? "text-red-200 bg-white/15 backdrop-blur-sm"
-                        : "text-white hover:text-red-200 hover:bg-white/10 hover:backdrop-blur-sm"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-shadow">{item.label}</span>
-                      {item.type === "dropdown" && (
-                        <ChevronDown
-                          className={`w-4 h-4 transition-transform duration-300 ${
-                            activeDropdown === item.id ? "rotate-180" : ""
-                          }`}
-                        />
-                      )}
-                    </div>
-                  </button>
+      <aside className="space-y-6">
+        <h3 className="text-lg font-semibold text-slate-800 border-b pb-2">Leia Também</h3>
+        <ul className="space-y-4">
+          {relatedNews.map((item) => (
+            <li key={item.id} className="flex gap-3 cursor-pointer" onClick={() => onTabChange(item.id)}>
+              <div className="relative w-20 h-16 flex-shrink-0 rounded overflow-hidden">
+                <Image src={item.image} alt={item.title} fill className="object-cover" />
+              </div>
+              <div className="text-sm text-slate-700">
+                <p className="font-semibold leading-snug line-clamp-2">{item.title}</p>
+                <span className="text-xs text-slate-500">{item.date}</span>
+              </div>
+            </li>
+          ))}
+        </ul>
 
-                  {/* Mobile Dropdown */}
-                  {item.type === "dropdown" && activeDropdown === item.id && (
-                    <div className="ml-4 mt-2 space-y-1">
-                      {item.items?.map((subItem) => (
-                        <button
-                          key={subItem.id}
-                          onClick={(e) => handleSubMenuClick(e, subItem.id)}
-                          onTouchEnd={(e) => handleSubMenuClick(e, subItem.id)}
-                          className={`w-full text-left text-sm py-4 px-4 rounded-lg transition-all duration-200 touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent relative z-10 ${
-                            activeTab === subItem.id
-                              ? "text-red-200 bg-white/20 font-semibold backdrop-blur-sm border border-white/20"
-                              : "text-slate-200 hover:text-red-200 hover:bg-white/15 hover:backdrop-blur-sm active:bg-white/25 active:text-white"
-                          }`}
-                          style={{
-                            minHeight: "48px",
-                            display: "flex",
-                            alignItems: "center",
-                            WebkitTapHighlightColor: "transparent",
-                          }}
-                        >
-                          <span className="pointer-events-none">{subItem.label}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-
-              <Button
-                className="bg-white text-red-600 hover:bg-red-50 font-semibold w-full mt-4 py-3 hover-lift btn-hover-lift ripple touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-                onClick={() => {
-                  handleInscricaoClick()
-                  setIsMenuOpen(false)
-                }}
-              >
-                Inscreva-se
-              </Button>
-            </nav>
-          </div>
+        <div className="pt-6 border-t">
+          <Image src="/images/banner-promocional.jpg" alt="Banner Promocional" width={400} height={200} className="rounded shadow" />
         </div>
-      </div>
-    </header>
+      </aside>
+    </div>
   )
 }
