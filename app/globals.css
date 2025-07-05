@@ -88,6 +88,91 @@ h6 {
   }
 }
 
+/* Remove outline azul padrão dos elementos focados */
+*:focus {
+  outline: none;
+}
+
+/* Aplicar focus-visible apenas quando necessário */
+*:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Remover outline específico para links e botões */
+a:focus,
+button:focus {
+  outline: none;
+}
+
+/* Aplicar focus-visible para links e botões */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Melhorar interações touch no mobile */
+@media (hover: none) and (pointer: coarse) {
+  /* Remover hover states em dispositivos touch */
+  .hover-lift:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .hover-scale:hover {
+    transform: none;
+  }
+
+  .hover-glow:hover {
+    box-shadow: none;
+    transform: none;
+  }
+
+  /* Melhorar estados active para touch */
+  .touch-manipulation:active {
+    transform: scale(0.98);
+    opacity: 0.8;
+  }
+
+  button:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+}
+
+/* Remover highlight azul no touch */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Permitir seleção de texto onde necessário */
+p,
+span,
+div,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+input,
+textarea {
+  -webkit-user-select: text;
+  -khtml-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
 /* Smooth scroll behavior */
 html {
   scroll-behavior: smooth;
@@ -115,13 +200,6 @@ html {
 ::selection {
   background: linear-gradient(135deg, #1e40af, #dc2626);
   color: white;
-}
-
-/* Focus styles */
-:focus-visible {
-  outline: 2px solid #1e40af;
-  outline-offset: 2px;
-  border-radius: 4px;
 }
 
 /* Improved typography */
