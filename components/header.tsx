@@ -1,7 +1,8 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect, useRef } from "react"
-import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Menu, X, ChevronDown } from "lucide-react"
@@ -96,15 +97,34 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
     if (item.type === "single") {
       onTabChange(item.id)
       setActiveDropdown(null)
-      setIsMenuOpen(false) // Fechar menu mobile ao clicar
+      setIsMenuOpen(false)
     } else {
       setActiveDropdown(activeDropdown === item.id ? null : item.id)
     }
   }
 
-  const handleSubMenuClick = (id: string) => {
-    onTabChange(id)
+  const handleSubMenuClick = (event: React.MouseEvent | React.TouchEvent, id: string) => {
+    // Prevenir comportamentos padrão
+    event.preventDefault()
+    event.stopPropagation()
+
+    // Log para debug (remover depois)
+    console.log("SubMenu clicked:", id)
+
+    // Fechar dropdown imediatamente
     setActiveDropdown(null)
+
+    // Fechar menu mobile
+    setIsMenuOpen(false)
+
+    // Pequeno delay para garantir que a navegação aconteça após o fechamento
+    setTimeout(() => {
+      onTabChange(id)
+    }, 50)
+  }
+
+  const handleLogoClick = () => {
+    onTabChange("home")
     setIsMenuOpen(false)
   }
 
@@ -127,7 +147,10 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
       <div className="container mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center group" onClick={() => onTabChange("home")}>
+          <button
+            onClick={handleLogoClick}
+            className="flex items-center group focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent rounded-lg"
+          >
             <div className="relative">
               <Image
                 src="/images/logo-10-na-bola.png"
@@ -137,7 +160,7 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
                 className="w-[120px] h-[120px] sm:w-[170px] sm:h-[170px] object-contain transition-transform duration-500 group-hover:scale-110 hover-glow"
               />
             </div>
-          </Link>
+          </button>
 
           {/* Desktop Menu */}
           <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8" ref={dropdownRef}>
@@ -145,7 +168,7 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
               <div key={item.label} className="relative">
                 <button
                   onClick={() => handleMenuClick(item)}
-                  className={`flex items-center space-x-1 font-medium text-sm tracking-wide transition-all duration-300 py-2 px-3 xl:px-4 rounded-lg hover-lift ${
+                  className={`flex items-center space-x-1 font-medium text-sm tracking-wide transition-all duration-300 py-2 px-3 xl:px-4 rounded-lg hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent ${
                     isActiveItem(item)
                       ? "text-red-200 bg-white/15 shadow-lg backdrop-blur-sm"
                       : "text-white hover:text-red-200 hover:bg-white/10 hover:backdrop-blur-sm"
@@ -167,8 +190,8 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
                     {item.items?.map((subItem) => (
                       <button
                         key={subItem.id}
-                        onClick={() => handleSubMenuClick(subItem.id)}
-                        className={`w-full text-left px-4 py-3 text-sm transition-all duration-300 hover-lift ${
+                        onClick={(e) => handleSubMenuClick(e, subItem.id)}
+                        className={`w-full text-left px-4 py-3 text-sm transition-all duration-300 hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-inset ${
                           activeTab === subItem.id
                             ? "text-blue-600 bg-blue-50/80 font-semibold backdrop-blur-sm"
                             : "text-slate-700 hover:text-blue-600 hover:bg-slate-50/80 hover:backdrop-blur-sm"
@@ -186,7 +209,7 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
           {/* CTA Button */}
           <div className="hidden lg:block">
             <Button
-              className="bg-white text-red-600 hover:bg-red-50 font-semibold px-4 xl:px-6 py-2.5 text-sm tracking-wide transition-all duration-300 hover:shadow-xl hover-lift btn-hover-lift ripple"
+              className="bg-white text-red-600 hover:bg-red-50 font-semibold px-4 xl:px-6 py-2.5 text-sm tracking-wide transition-all duration-300 hover:shadow-xl hover-lift btn-hover-lift ripple focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-red-600"
               onClick={handleInscricaoClick}
             >
               Inscreva-se
@@ -195,7 +218,7 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
 
           {/* Mobile Menu Button */}
           <button
-            className="lg:hidden p-2 rounded-lg hover:bg-red-800/50 transition-all duration-300 hover-scale touch-manipulation"
+            className="lg:hidden p-2 rounded-lg hover:bg-red-800/50 transition-all duration-300 hover-scale touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             <div className="relative w-6 h-6">
@@ -227,7 +250,7 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
                 <div key={item.label}>
                   <button
                     onClick={() => handleMenuClick(item)}
-                    className={`w-full text-left font-medium text-sm tracking-wide transition-all duration-300 py-3 px-4 rounded-lg hover-lift touch-manipulation ${
+                    className={`w-full text-left font-medium text-sm tracking-wide transition-all duration-300 py-3 px-4 rounded-lg hover-lift touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent ${
                       isActiveItem(item)
                         ? "text-red-200 bg-white/15 backdrop-blur-sm"
                         : "text-white hover:text-red-200 hover:bg-white/10 hover:backdrop-blur-sm"
@@ -247,18 +270,25 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
 
                   {/* Mobile Dropdown */}
                   {item.type === "dropdown" && activeDropdown === item.id && (
-                    <div className="ml-4 mt-2 space-y-1 animate-fade-in-down">
+                    <div className="ml-4 mt-2 space-y-1">
                       {item.items?.map((subItem) => (
                         <button
                           key={subItem.id}
-                          onClick={() => handleSubMenuClick(subItem.id)}
-                          className={`w-full text-left text-sm py-3 px-4 rounded-lg transition-all duration-300 hover-lift touch-manipulation ${
+                          onClick={(e) => handleSubMenuClick(e, subItem.id)}
+                          onTouchEnd={(e) => handleSubMenuClick(e, subItem.id)}
+                          className={`w-full text-left text-sm py-4 px-4 rounded-lg transition-all duration-200 touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent relative z-10 ${
                             activeTab === subItem.id
-                              ? "text-red-200 bg-white/15 font-semibold backdrop-blur-sm"
-                              : "text-slate-200 hover:text-red-200 hover:bg-white/10 hover:backdrop-blur-sm"
+                              ? "text-red-200 bg-white/20 font-semibold backdrop-blur-sm border border-white/20"
+                              : "text-slate-200 hover:text-red-200 hover:bg-white/15 hover:backdrop-blur-sm active:bg-white/25 active:text-white"
                           }`}
+                          style={{
+                            minHeight: "48px",
+                            display: "flex",
+                            alignItems: "center",
+                            WebkitTapHighlightColor: "transparent",
+                          }}
                         >
-                          {subItem.label}
+                          <span className="pointer-events-none">{subItem.label}</span>
                         </button>
                       ))}
                     </div>
@@ -267,7 +297,7 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
               ))}
 
               <Button
-                className="bg-white text-red-600 hover:bg-red-50 font-semibold w-full mt-4 py-3 hover-lift btn-hover-lift ripple touch-manipulation"
+                className="bg-white text-red-600 hover:bg-red-50 font-semibold w-full mt-4 py-3 hover-lift btn-hover-lift ripple touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
                 onClick={() => {
                   handleInscricaoClick()
                   setIsMenuOpen(false)
