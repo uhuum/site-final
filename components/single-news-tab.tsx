@@ -1,8 +1,7 @@
 "use client"
 
-// components/SingleNewsTab.tsx
 import { useState } from "react"
-import { Calendar, ArrowLeft, Share2, Heart, MessageSquare } from "lucide-react"
+import { Calendar, ArrowLeft, Share2, Heart, MessageSquare, Copy, Check } from "lucide-react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
@@ -12,7 +11,7 @@ interface SingleNewsTabProps {
   newsId: string
   onTabChange: (tab: string) => void
   onBackToNews: () => void
-  onSelectNews?: (newsId: string) => void // Adicionar esta linha
+  onSelectNews?: (newsId: string) => void
 }
 
 const allNews = [
@@ -25,12 +24,18 @@ const allNews = [
     image: "/images/materia willian.png",
     category: "Depoimentos",
     highlight: true,
+    gallery: [
+      "/images/materia willian.png",
+      "/images/treino-sub17-descanso.png",
+      "/images/treino-orientacoes-tecnicas.png",
+      "/images/copa-rei-2025-sub17-campeao.png",
+    ],
     content: `
       <p>William, atleta da categoria Sub-15 da nossa Escolinha 10 na Bola, deu um passo importante em sua carreira: agora faz parte do tradicional <strong>Clube Terceiro Milênio</strong>.</p>
       <p>Em entrevista à nossa equipe, ele contou como foi sua trajetória até essa conquista e quais são suas expectativas para o futuro no futebol.</p>
       <h3>Um sonho em construção</h3>
       <p>Com apenas 15 anos, William foi aprovado no Clube Terceiro Milênio, referência na formação de jovens talentos na Zona Sul de São Paulo.</p>
-      <h3>“Esse é o meu primeiro grande passo”</h3>
+      <h3>"Esse é o meu primeiro grande passo"</h3>
       <blockquote><p>"Me sinto feliz e confiante. Esse é o primeiro passo da minha carreira, e espero que através desse clube eu me torne um grande jogador."</p></blockquote>
       <h3>Parabéns, William!</h3>
       <p>Parabenizamos o William por essa nova fase e desejamos muito sucesso nessa jornada. Seguiremos acompanhando sua evolução com orgulho e torcida!</p>
@@ -45,6 +50,12 @@ const allNews = [
     image: "/images/copa-rei-2025-sub13-campeao.png",
     category: "Campeonatos",
     highlight: true,
+    gallery: [
+      "/images/copa-rei-2025-sub13-campeao.png",
+      "/images/copa-rei-2025-sub17-campeao.png",
+      "/images/copa-rei-2024-sub15-campeao.png",
+      "/images/treino-campo.png",
+    ],
     content: `
       <p>Em uma campanha histórica, as equipes Sub-13 e Sub-17 da Escola de Futebol 10 na Bola conquistaram os títulos da Copa do Rei 2025, consolidando nossa posição como uma das principais escolas de futebol da Zona Sul de São Paulo.</p>
       <h3>Sub-13 - Campeões Invictos</h3>
@@ -62,6 +73,12 @@ const allNews = [
     image: "/images/copa-art-soccer-2025-finais.png",
     category: "Campeonatos",
     highlight: true,
+    gallery: [
+      "/images/copa-art-soccer-2025-finais.png",
+      "/images/copa-ad-soccer-2024-sub12-campeao-nova.png",
+      "/images/final-copa-real-kids-2024-sub10-campeao.png",
+      "/images/treino-sub08-criancas.png",
+    ],
     content: `
       <p>A Copa Art Soccer 2025 foi palco de grandes emoções para nossas categorias de base.</p>
       <h3>Resultados das Finais</h3>
@@ -81,6 +98,12 @@ const allNews = [
     image: "/images/DIA 01-07 INICIO DAS FÉRIAS NA NOSSA ESCOLINHA (1).png",
     category: "Comunicados",
     highlight: true,
+    gallery: [
+      "/images/DIA 01-07 INICIO DAS FÉRIAS NA NOSSA ESCOLINHA (1).png",
+      "/images/treino-aniversario-2024-especial.png",
+      "/images/treino-sub11-descanso.png",
+      "/images/vista-aerea-escola.png",
+    ],
     content: `
       <p>As férias escolares chegaram, mas na Escolinha 10 na Bola a diversão e o aprendizado continuam!</p>
       <h3>Programação Especial</h3>
@@ -102,6 +125,12 @@ const allNews = [
     image: "/images/COPA SOCCER EDIÇÃO 2024 (2).png",
     category: "Comunicados",
     highlight: true,
+    gallery: [
+      "/images/COPA SOCCER EDIÇÃO 2024 (2).png",
+      "/images/treino-orientacoes-tecnicas.png",
+      "/images/treino-sub14-orientacoes.png",
+      "/images/10NABOLA E CEAP.png",
+    ],
     content: `
       <p>Já estão disponíveis as novas camisas oficiais da Escolinha 10 na Bola!</p>
       <h3>Modelos Disponíveis:</h3>
@@ -115,11 +144,10 @@ const allNews = [
   },
 ]
 
-const imageGallery = ["/images/galeria1.jpg", "/images/galeria2.jpg", "/images/galeria3.jpg", "/images/galeria4.jpg"]
-
 export default function SingleNewsTab({ newsId, onTabChange, onBackToNews, onSelectNews }: SingleNewsTabProps) {
   const [liked, setLiked] = useState(false)
-  const [shared, setShared] = useState(false)
+  const [showShareMenu, setShowShareMenu] = useState(false)
+  const [linkCopied, setLinkCopied] = useState(false)
   const [comment, setComment] = useState("")
   const [comments, setComments] = useState<string[]>([])
 
@@ -132,14 +160,31 @@ export default function SingleNewsTab({ newsId, onTabChange, onBackToNews, onSel
   const handleLike = () => setLiked(!liked)
 
   const handleShare = () => {
+    setShowShareMenu(!showShareMenu)
+  }
+
+  const handleWhatsAppShare = () => {
     const url = typeof window !== "undefined" ? window.location.href : ""
-    if (navigator.share) {
-      navigator.share({ title: "Notícia 10 na Bola", url })
-    } else {
-      navigator.clipboard.writeText(url)
-      setShared(true)
-      setTimeout(() => setShared(false), 3000)
-    }
+    const text = `${news.title} - ${url}`
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank")
+    setShowShareMenu(false)
+  }
+
+  const handleInstagramShare = () => {
+    // Instagram não permite compartilhamento direto via URL, então vamos copiar o link
+    const url = typeof window !== "undefined" ? window.location.href : ""
+    navigator.clipboard.writeText(`${news.title} - ${url}`)
+    setLinkCopied(true)
+    setTimeout(() => setLinkCopied(false), 3000)
+    setShowShareMenu(false)
+  }
+
+  const handleCopyLink = () => {
+    const url = typeof window !== "undefined" ? window.location.href : ""
+    navigator.clipboard.writeText(url)
+    setLinkCopied(true)
+    setTimeout(() => setLinkCopied(false), 3000)
+    setShowShareMenu(false)
   }
 
   const handleCommentSubmit = () => {
@@ -149,16 +194,32 @@ export default function SingleNewsTab({ newsId, onTabChange, onBackToNews, onSel
     }
   }
 
+  const handleRelatedNewsClick = (relatedNewsId: string) => {
+    // Scroll para o topo
+    window.scrollTo({ top: 0, behavior: "smooth" })
+
+    // Navegar para a notícia
+    if (typeof onSelectNews === "function") {
+      onSelectNews(relatedNewsId)
+    }
+  }
+
   return (
-    <div className="max-w-7xl mx-auto py-10 px-4 grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-12 font-sans">
+    <div className="max-w-7xl mx-auto py-6 sm:py-10 px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8 sm:gap-12 font-sans">
       <main className="prose prose-lg prose-slate max-w-none">
-        <div className="mb-6">
-          <Button onClick={onBackToNews} variant="outline" className="flex items-center text-sm bg-transparent">
+        <div className="mb-4 sm:mb-6">
+          <Button
+            onClick={onBackToNews}
+            variant="outline"
+            className="flex items-center text-sm bg-transparent touch-manipulation"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" /> Voltar para lista
           </Button>
         </div>
 
-        <h1 className="text-4xl font-extrabold text-slate-900 mb-2 leading-tight">{news.title}</h1>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 mb-2 leading-tight">
+          {news.title}
+        </h1>
 
         <div className="flex items-center text-slate-500 text-sm mb-4">
           <Calendar className="w-4 h-4 mr-1" />
@@ -169,60 +230,97 @@ export default function SingleNewsTab({ newsId, onTabChange, onBackToNews, onSel
           <Image src={news.image || "/placeholder.svg"} alt={news.title} fill className="object-cover" />
         </div>
 
-        <div className="flex flex-wrap gap-4 mb-8">
-          <Button variant="ghost" size="sm" onClick={handleLike} className={liked ? "text-red-600" : "text-slate-700"}>
+        <div className="flex flex-wrap gap-3 sm:gap-4 mb-6 sm:mb-8 relative">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLike}
+            className={`${liked ? "text-red-600" : "text-slate-700"} touch-manipulation`}
+          >
             <Heart className={`w-4 h-4 mr-1 ${liked ? "fill-red-600" : ""}`} />
             {liked ? "Curtido" : "Curtir"}
           </Button>
 
-          <Button variant="ghost" size="sm" onClick={handleShare}>
-            <Share2 className="w-4 h-4 mr-1" /> {shared ? "Link copiado!" : "Compartilhar"}
-          </Button>
+          <div className="relative">
+            <Button variant="ghost" size="sm" onClick={handleShare} className="touch-manipulation">
+              <Share2 className="w-4 h-4 mr-1" /> Compartilhar
+            </Button>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex items-center gap-1 text-green-600"
-            onClick={() =>
-              window.open(
-                `https://api.whatsapp.com/send?text=${encodeURIComponent(news.title + " - " + window.location.href)}`,
-              )
-            }
-          >
-            <FaWhatsapp className="w-4 h-4" /> WhatsApp
-          </Button>
+            {/* Share Menu */}
+            {showShareMenu && (
+              <div className="absolute top-full left-0 mt-2 bg-white border border-slate-200 rounded-lg shadow-lg py-2 z-50 min-w-[200px]">
+                <button
+                  onClick={handleWhatsAppShare}
+                  className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors touch-manipulation"
+                >
+                  <FaWhatsapp className="w-4 h-4 text-green-600" />
+                  WhatsApp
+                </button>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex items-center gap-1 text-pink-500"
-            onClick={() => window.open(`https://www.instagram.com/?url=${encodeURIComponent(window.location.href)}`)}
-          >
-            <FaInstagram className="w-4 h-4" /> Instagram
-          </Button>
+                <button
+                  onClick={handleInstagramShare}
+                  className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors touch-manipulation"
+                >
+                  <FaInstagram className="w-4 h-4 text-pink-500" />
+                  Instagram (Copiar)
+                </button>
+
+                <button
+                  onClick={handleCopyLink}
+                  className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors touch-manipulation"
+                >
+                  {linkCopied ? (
+                    <>
+                      <Check className="w-4 h-4 text-green-600" />
+                      Link copiado!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4 text-slate-600" />
+                      Copiar link
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
+
+        {linkCopied && (
+          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-800 text-sm">
+            ✅ Link copiado para a área de transferência!
+          </div>
+        )}
 
         <div dangerouslySetInnerHTML={{ __html: news.content }} />
 
-        <div className="mt-12">
-          <h3 className="text-2xl font-bold mb-4">📸 Galeria de Fotos</h3>
-          <Carousel className="w-full max-w-4xl mx-auto">
-            <CarouselContent>
-              {imageGallery.map((src, index) => (
-                <CarouselItem key={index} className="flex justify-center">
-                  <div className="relative w-full h-72 md:h-96 rounded overflow-hidden">
-                    <Image src={src || "/placeholder.svg"} alt={`Imagem ${index + 1}`} fill className="object-cover" />
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-          </Carousel>
-        </div>
+        {/* Galeria de Fotos da Notícia */}
+        {news.gallery && news.gallery.length > 0 && (
+          <div className="mt-8 sm:mt-12">
+            <h3 className="text-xl sm:text-2xl font-bold mb-4">📸 Galeria de Fotos</h3>
+            <Carousel className="w-full max-w-4xl mx-auto">
+              <CarouselContent>
+                {news.gallery.map((src, index) => (
+                  <CarouselItem key={index} className="flex justify-center">
+                    <div className="relative w-full h-64 sm:h-72 md:h-96 rounded overflow-hidden">
+                      <Image
+                        src={src || "/placeholder.svg"}
+                        alt={`${news.title} - Imagem ${index + 1}`}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="touch-manipulation" />
+              <CarouselNext className="touch-manipulation" />
+            </Carousel>
+          </div>
+        )}
 
-        <div className="mt-12 border-t pt-6">
-          <h3 className="text-xl font-bold text-slate-900 mb-2 flex items-center">
+        <div className="mt-8 sm:mt-12 border-t pt-6">
+          <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2 flex items-center">
             <MessageSquare className="w-4 h-4 mr-2" /> Comentários
           </h3>
           <div className="space-y-4">
@@ -241,25 +339,27 @@ export default function SingleNewsTab({ newsId, onTabChange, onBackToNews, onSel
                 placeholder="Escreva um comentário..."
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                className="border px-3 py-2 rounded w-full text-sm"
+                className="border px-3 py-2 rounded w-full text-sm touch-manipulation"
               />
-              <Button onClick={handleCommentSubmit} className="bg-blue-900 text-white">
+              <Button onClick={handleCommentSubmit} className="bg-blue-900 text-white touch-manipulation">
                 Enviar
               </Button>
             </div>
           </div>
         </div>
 
-        <div className="border-t mt-12 pt-8 text-center bg-slate-50 rounded-lg p-8 mx-auto max-w-2xl">
-          <h2 className="text-2xl font-semibold mb-4 text-slate-900">Gostou da notícia?</h2>
-          <p className="text-slate-600 mb-6 text-lg">
+        <div className="border-t mt-8 sm:mt-12 pt-6 sm:pt-8 text-center bg-slate-50 rounded-lg p-6 sm:p-8 mx-auto max-w-2xl">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-slate-900">Gostou da notícia?</h2>
+          <p className="text-slate-600 mb-4 sm:mb-6 text-base sm:text-lg">
             Compartilhe com seus amigos ou conheça mais sobre a nossa escola.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button className="bg-blue-900 text-white hover:bg-blue-800 px-6 py-3">Entrar em Contato</Button>
+          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
+            <Button className="bg-blue-900 text-white hover:bg-blue-800 px-4 sm:px-6 py-2 sm:py-3 touch-manipulation">
+              Entrar em Contato
+            </Button>
             <Button
               variant="outline"
-              className="border-blue-900 text-blue-900 bg-transparent hover:bg-blue-50 px-6 py-3"
+              className="border-blue-900 text-blue-900 bg-transparent hover:bg-blue-50 px-4 sm:px-6 py-2 sm:py-3 touch-manipulation"
               onClick={() => onTabChange("sobre")}
             >
               Conheça a Escola
@@ -269,23 +369,15 @@ export default function SingleNewsTab({ newsId, onTabChange, onBackToNews, onSel
       </main>
 
       <aside className="space-y-6">
-        <h3 className="text-lg font-semibold text-slate-800 border-b pb-2">Leia Também</h3>
+        <h3 className="text-base sm:text-lg font-semibold text-slate-800 border-b pb-2">Leia Também</h3>
         <ul className="space-y-4">
           {relatedNews.map((item) => (
             <li
               key={item.id}
-              className="flex gap-3 cursor-pointer"
-              onClick={() => {
-                // Navegar para a notícia específica
-                window.location.hash = item.id
-                onTabChange("single-news")
-                // Se houver uma função onSelectNews disponível, use ela
-                if (typeof onSelectNews === "function") {
-                  onSelectNews(item.id)
-                }
-              }}
+              className="flex gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-lg transition-colors touch-manipulation"
+              onClick={() => handleRelatedNewsClick(item.id)}
             >
-              <div className="relative w-20 h-16 flex-shrink-0 rounded overflow-hidden">
+              <div className="relative w-16 sm:w-20 h-12 sm:h-16 flex-shrink-0 rounded overflow-hidden">
                 <Image src={item.image || "/placeholder.svg"} alt={item.title} fill className="object-cover" />
               </div>
               <div className="text-sm text-slate-700">
@@ -302,7 +394,7 @@ export default function SingleNewsTab({ newsId, onTabChange, onBackToNews, onSel
             alt="Banner Promocional"
             width={400}
             height={200}
-            className="rounded shadow"
+            className="rounded shadow w-full h-auto"
           />
         </div>
       </aside>
