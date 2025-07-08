@@ -28,7 +28,9 @@ export default function AboutSection() {
       <div id="about-section" className="container mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-20 items-center">
           <div
-            className={`space-y-8 transition-all duration-1000 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"}`}
+            className={`space-y-8 transition-all duration-1000 ${
+              isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"
+            }`}
           >
             <div className="space-y-6">
               <div className="inline-flex items-center px-4 py-2 bg-red-600/10 rounded-full">
@@ -36,32 +38,46 @@ export default function AboutSection() {
               </div>
 
               <h2 className="text-4xl md:text-5xl font-bold text-slate-900 leading-tight tracking-tight">
-                Educação e Futebol
+                Futebol e Educação
                 <br />
-                <span className="text-red-600">Lado a Lado</span>
+                <span className="text-red-600">Transformando Vidas</span>
               </h2>
             </div>
 
             <div className="space-y-6 text-lg text-slate-600 leading-relaxed">
               <p>
-                A <strong className="text-slate-900">"10 na Bola"</strong> é uma escola de futebol com compromisso
-                social, que alia esporte e formação humana. Atendemos crianças e adolescentes da comunidade com treinos
-                técnicos, acompanhamento e incentivo ao estudo.
+                A <strong className="text-slate-900">10 na Bola</strong> é muito mais que uma escolinha de futebol: é um projeto social
+                com raízes profundas na <strong className="text-blue-900">comunidade do Jardim Pedreira</strong>, na Zona Sul de São Paulo,
+                sediada no campo do CEAP.
               </p>
+
               <p>
-                Desde <strong className="text-red-600">setembro de 2021</strong>, nossa missão é desenvolver não apenas
-                habilidades esportivas, mas também valores fundamentais como disciplina, respeito, trabalho em equipe e
-                responsabilidade social.
+                Desde <strong className="text-red-600">setembro de 2021</strong>, nosso propósito tem sido claro e transformador:
+                oferecer um ambiente seguro, acolhedor e educativo para crianças e adolescentes,
+                onde o esporte se torna ferramenta para desenvolvimento humano, cidadania e inclusão.
               </p>
+
               <p>
-                Localizada na <strong className="text-blue-900">Zona Sul de São Paulo</strong>, oferecemos treinos de
-                iniciação e alto rendimento, sempre priorizando a formação integral de nossos alunos.
+                Atendemos meninos e meninas, muitos em situação de vulnerabilidade social, com treinos técnicos e acompanhamento
+                que vão além da bola — cultivando valores como respeito, disciplina, trabalho em equipe, resiliência e empatia.
+                Aqui, ninguém fica de fora por motivos financeiros; nossa missão é promover a igualdade de oportunidades.
+              </p>
+
+              <p>
+                Com turmas organizadas por idade e uma equipe dedicada, oferecemos treinos de segunda a sexta-feira até às 21h,
+                formando não só atletas, mas cidadãos conscientes e preparados para os desafios da vida.
+              </p>
+
+              <p className="font-semibold text-slate-900">
+                Na 10 na Bola, a bola rola para todos. Sempre.
               </p>
             </div>
           </div>
 
           <div
-            className={`relative transition-all duration-1000 delay-300 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"}`}
+            className={`relative transition-all duration-1000 delay-300 ${
+              isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
+            }`}
           >
             <div className="relative group cursor-pointer">
               <div className="relative bg-white rounded-3xl p-6 shadow-2xl shadow-slate-900/10 transition-all duration-500 group-hover:shadow-3xl group-hover:shadow-slate-900/15">

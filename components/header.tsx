@@ -149,17 +149,18 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
           {/* Logo */}
           <button
             onClick={handleLogoClick}
-            className="flex items-center group focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent rounded-lg"
+            className="flex items-center group focus:outline-none "
           >
-            <div className="relative">
-              <Image
-                src="/images/logo-10-na-bola.png"
-                alt="10 na Bola"
-                width={100}
-                height={100}
-                className="w-[120px] h-[120px] sm:w-[170px] sm:h-[170px] object-contain transition-transform duration-500 group-hover:scale-110 hover-glow"
-              />
-            </div>
+<div className="relative shadow-none">
+  <Image
+    src="/images/logo-10-na-bola.png"
+    alt="10 na Bola"
+    width={100}
+    height={100}
+    className="w-[120px] h-[120px] sm:w-[170px] sm:h-[170px] object-contain shadow-none hover:shadow-none focus:shadow-none"
+  />
+</div>
+
           </button>
 
           {/* Desktop Menu */}
